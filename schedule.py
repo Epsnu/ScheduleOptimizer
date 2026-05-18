@@ -23,7 +23,7 @@ class Schedule:
         missing_shifts = [name for name in self.shift_names if name not in shift_lookup.index]
         if missing_shifts:
             missing = ", ".join(missing_shifts)
-            print(f"Warning: missing shift metadata for {missing}\n")
+            print(f"Warning: missing shift metadata for: {missing}\n")
 
         self.S = shift_lookup.loc[self.shift_names].to_numpy(dtype=float)
 
@@ -116,7 +116,10 @@ class Schedule:
         penalty = 0.0
         for i in range(self.n):
             for j in range(self.x):
-                penalty += max(0.0, tau - self.P_hat_i(i, theta[i, j])) ** 2
+                shift_value = self._clip_shift_value(theta[i, j])
+                if shift_value == 0.0:
+                    continue
+                penalty += max(0.0, tau - self.P_hat_i(i, shift_value)) ** 2
         return float(penalty)
 
     # penalty C4
