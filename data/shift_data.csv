@@ -1,4 +1,4 @@
-﻿shift,hours,num_workers
+﻿name,hours,num_workers
 mlp,1,2
 mlc,1,2
 mpd,2,2
