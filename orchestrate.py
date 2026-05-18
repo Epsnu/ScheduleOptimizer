@@ -32,7 +32,7 @@ class Schedule:
             np.ceil(1/n*sum(S[:,0]*S[:,1])),
             max(S[:,0])
         )
-        
+
         self.n = n
         self.k = k
         self.P = P
@@ -69,9 +69,8 @@ class Schedule:
     # penalty helper
     def C_im(self, theta, m, i, sigma):
         C_im = 0
-        for i in range(self.n):
-            for j in range(self.x):
-                C_im += self.K(sigma, theta[i,j] - m)
+        for j in range(self.x):
+            C_im += self.K(sigma, theta[i,j] - m)
         return C_im
     
     # penalty C1
@@ -79,7 +78,7 @@ class Schedule:
         Penalty_C1 = 0
         for m in range(self.k):
             for i in range(self.n):
-                Penalty_C1 += (self.C_im(theta, m, i, sigma) - (self.S[m,1]*self.S[m,2]))^2
+                Penalty_C1 += (self.C_im(theta, m, i, sigma) - (self.S[m,0]*self.S[m,1]))^2
         return Penalty_C1
     
     # penalty C2
@@ -87,7 +86,7 @@ class Schedule:
         Penalty_C2 = 0
         for m in range(self.k):
             for i in range(self.n):
-                Penalty_C2 += max(0, self.C_im(theta, m, i, sigma) - self.S[m,1])^2
+                Penalty_C2 += max(0, self.C_im(theta, m, i, sigma) - self.S[m,0])^2
         return Penalty_C2
     
     # penalty C3
@@ -103,7 +102,7 @@ class Schedule:
         Penalty_C4 = 0
         for m in range(self.k):
             for i in range(self.n):
-                Penalty_C4 += self.C_im(theta, m, i, sigma)^2*(self.C_im(theta, m, i, sigma) - self.S[m,1])^2
+                Penalty_C4 += self.C_im(theta, m, i, sigma)^2*(self.C_im(theta, m, i, sigma) - self.S[m,0])^2
         return Penalty_C4
         
 
