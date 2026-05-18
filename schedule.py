@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from io import StringIO
+from contextlib import redirect_stdout
 
 
 class Schedule:
@@ -21,11 +23,17 @@ class Schedule:
             .set_index("name")[["hours", "num_workers"]]
         )
         missing_shifts = [name for name in self.shift_names if name not in shift_lookup.index]
+        shift_rows = []
         if missing_shifts:
             missing = ", ".join(missing_shifts)
             print(f"Warning: missing shift metadata for: {missing}\n")
+        for name in self.shift_names:
+            if name in shift_lookup.index:
+                shift_rows.append(shift_lookup.loc[name].to_numpy(dtype=float))
+            else:
+                shift_rows.append(np.array([0.0, 0.0]))
 
-        self.S = shift_lookup.loc[self.shift_names].to_numpy(dtype=float)
+        self.S = np.vstack(shift_rows) if shift_rows else np.zeros((0, 2), dtype=float)
 
         total_required_hours = float(np.sum(self.S[:, 0] * self.S[:, 1]))
         max_shift_hours = float(np.max(self.S[:, 0])) if self.k else 0.0

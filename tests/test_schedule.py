@@ -1,4 +1,6 @@
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 import numpy as np
@@ -23,12 +25,15 @@ class ScheduleTests(unittest.TestCase):
         self.assertEqual(self.schedule.P.shape, (5, 4))
         self.assertEqual(self.schedule.S.shape, (4, 2))
 
-    def test_missing_shift_metadata_raises_clear_error(self):
-        with self.assertRaisesRegex(ValueError, "Missing shift metadata for: s3"):
-            Schedule(
+    def test_missing_shift_metadata_warns_and_uses_zero_row(self):
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            schedule = Schedule(
                 FIXTURES / "prefs_missing_shift.csv",
                 FIXTURES / "shifts_missing_shift.csv",
             )
+        self.assertIn("Warning: missing shift metadata for: s3", buffer.getvalue())
+        np.testing.assert_allclose(schedule.S[2], np.array([0.0, 0.0]))
 
     def test_p_hat_supports_zero_sentinel_and_interpolation(self):
         self.assertEqual(self.schedule.P_hat_i(0, 0.0), 0.0)
